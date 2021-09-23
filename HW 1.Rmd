@@ -1,0 +1,30 @@
+---
+title: "HW 1"
+output: github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(rvest)
+```
+
+```{r}
+page <- read_html("https://guide.wisc.edu/faculty/")
+ul <- html_nodes(page, "ul.uw-people")
+lis <- html_nodes(ul, "li")
+name <- c()
+position <- c()
+department <- c()
+degree <- c()
+for(i in 1:length(lis)){
+  text <- as.character(html_node(lis[i], "p"))
+  text <- gsub("<p>", "", text)
+  text <- gsub("</p>", "", text)
+  v <- unlist(strsplit(text, "<br>"))
+  name[i] <- v[1]
+  position[i] <- v[2]
+  department[i] <- v[3]
+  degree[i] <- v[4]
+}
+data <- data.frame(name, position, department, degree)
+write.csv(data, "instructors.csv", row.names = F)
+```
