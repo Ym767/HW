@@ -1,6 +1,6 @@
 ---
 title: "HW 2"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -38,8 +38,7 @@ colnames(Flight)[list]
 flights %>%
   mutate(dep_minutes_since_midnight=(dep_time%/%100)*60+dep_time%%100,
          sched_dep_minutes_since_midnight=(sched_dep_time%/%100)*60+sched_dep_time%%100) %>%
-  select(starts_with('dep_time'), starts_with('sched'))%>%
-  View()
+  select(dep_time, dep_minutes_since_midnight, sched_dep_time, sched_arr_time, sched_dep_minutes_since_midnight)
 ```
 
 ```{r}
