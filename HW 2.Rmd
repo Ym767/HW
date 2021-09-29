@@ -1,0 +1,54 @@
+---
+title: "HW 2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(nycflights13)
+library(ggplot2)
+```
+
+```{r}
+# Question 1
+Flight<-flights
+Missing<-which(is.na(Flight$dep_time)==TRUE)
+length(Missing)
+
+n<-dim(Flight)[2]
+  int1<-1:n
+  list<-c()
+  for (i in int1) {
+    Missing<-which(is.na(Flight[,i])==TRUE)
+    LM<-length(Missing)
+    if (LM!=0){
+      list[i]=i
+} else{
+list[i]=0 }
+}
+colnames(Flight)[list]
+```
+
+```{r}
+# Question 2
+flights %>%
+  mutate(dep_minutes_since_midnight=(dep_time%/%100)*60+dep_time%%100,
+         sched_dep_minutes_since_midnight=(sched_dep_time%/%100)*60+sched_dep_time%%100) %>%
+  select(starts_with('dep_time'), starts_with('sched'))%>%
+  View()
+```
+
+```{r}
+# Question 3
+flights %>% 
+  group_by(month, day) %>%
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE),
+            prop_cancelled = sum(is.na(dep_time)/n())) %>%
+  ggplot(mapping = aes(x = avg_dep_delay, y = prop_cancelled)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE)
+```
