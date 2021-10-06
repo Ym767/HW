@@ -1,0 +1,116 @@
+---
+title: "HW3"
+author: "Yeming Wei"
+date: "10/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# What time of day should you fly if you want to avoid delays as much as possible?
+
+```{r}
+library(nycflights13)
+library(dplyr)
+library(ggplot2)
+
+flights %>%
+  group_by(hour) %>%
+  summarise(arr_delay = mean(arr_delay, na.rm = TRUE),dep_delay=mean(dep_delay, na.rm = TRUE))
+```
+
+### I think it is much less likely to be delayed on a morning flight.
+
+# Depend on Season
+
+```{r}
+S_flights <- flights %>%
+  mutate(season = ifelse(month >= 3 & month <= 5, 'spring', 
+                         ifelse(month>=6 & month <= 8, "Summer",
+                                ifelse(month>=9&month <=11, "Autumn","winter"))))%>%
+  group_by(season)%>%
+  summarise(dep_delay=mean(dep_delay, na.rm = TRUE))%>%
+  arrange(dep_delay)
+  
+ggplot(S_flights, aes(x=season, y=dep_delay))+
+  geom_bar(stat="identity")+
+  labs(
+    x="season",
+    y="Dep_delay")
+```
+
+```{r}
+S_flights <- flights %>%
+  mutate(season = ifelse(month >= 3 & month <= 5, 'spring', 
+                         ifelse(month>=6 & month <= 8, "Summer",
+                                ifelse(month>=9&month <=11, "Autumn","winter"))))%>%
+  
+group_by(season)%>%
+  summarise(arr_delay=mean(arr_delay, na.rm = TRUE))%>%
+  arrange(arr_delay)
+  
+ggplot(S_flights, aes(x=season, y=arr_delay))+
+  geom_bar(stat="identity")+
+  labs(
+    x="season",
+    y="Arr_delay")
+```
+
+### The two graphs show the average delay time in different seasons, and summer flights have the most delay of departure or arrival.
+
+# Depend on Airlines
+
+```{r}
+A_delay <- flights %>%
+  group_by(carrier) %>%
+  summarise(dep_delay = mean(dep_delay,na.rm = T))%>%
+  arrange(dep_delay)
+
+ggplot(A_delay, aes(x=carrier, y=dep_delay))+
+  geom_bar(stat = "identity") +
+  labs(x=" carrier",
+       y="Dep_delay time")
+```
+
+```{r}
+A_delay <- flights %>%
+  group_by(carrier) %>%
+  summarise(arr_delay = mean(arr_delay,na.rm = T))%>%
+  arrange(arr_delay)
+
+ggplot(A_delay, aes(x=carrier, y=arr_delay))+
+  geom_bar(stat = "identity") +
+  labs(x=" carrier",
+       y="Arr_delay time")
+```
+
+
+### The above two graphs show the relationship between delay time and airlines. The top three airlines for delays are EV, F9, and FL. However, HA, US and HA are less likely to be a delay.
+
+# Depend on Airport
+
+```{r}
+A_1 <- flights %>%
+  group_by(origin) %>%
+  mutate(dep_delay_lag = lag(dep_delay)) %>%
+  arrange(dep_delay) 
+
+ggplot(A_1,aes(y = dep_delay, x = origin)) +
+  geom_bar(stat = "identity") +
+  labs(y = " Delay time", x = "Departure Delay")
+```
+
+```{r}
+A_1 <- flights %>%
+  group_by(origin) %>%
+  mutate(arr_delay_lag = lag(arr_delay)) %>%
+  arrange(arr_delay) 
+
+ggplot(A_1,aes(y = arr_delay, x = origin)) +
+  geom_bar(stat = "identity") +
+  labs(y = " Delay time", x = "Arrive Delay")
+```
+
+### The above two graphs show the relationship between delay time and Airport. The EWR has the most delay time.
